@@ -1,45 +1,44 @@
-/* A naive recursive implementation that simply
-follows the above optimal substructure property */
+// C++ program using memoization
 #include <bits/stdc++.h>
 using namespace std;
+int dp[100][100];
 
-// Matrix Ai has dimension p[i-1] x p[i]
-// for i = 1..n
-int MatrixChainOrder(int p[], int i, int j)
+// Function for matrix chain multiplication
+int matrixChainMemoised(int* p, int i, int j)
 {
 	if (i == j)
-		return 0;
-	int k;
-	int min = INT_MAX;
-	int count;
-
-	// place parenthesis at different places
-	// between first and last matrix, recursively
-	// calculate count of multiplications for
-	// each parenthesis placement and return the
-	// minimum count
-	for (k = i; k < j; k++)
 	{
-		count = MatrixChainOrder(p, i, k)
-				+ MatrixChainOrder(p, k + 1, j)
-				+ p[i - 1] * p[k] * p[j];
-
-		if (count < min)
-			min = count;
+		return 0;
 	}
-
-	// Return minimum count
-	return min;
+	if (dp[i][j] != -1)
+	{
+		return dp[i][j];
+	}
+	dp[i][j] = INT_MAX;
+	for (int k = i; k < j; k++)
+	{
+		dp[i][j] = min(
+			dp[i][j], matrixChainMemoised(p, i, k)
+					+ matrixChainMemoised(p, k + 1, j)
+					+ p[i - 1] * p[k] * p[j]);
+	}
+	return dp[i][j];
+}
+int MatrixChainOrder(int* p, int n)
+{
+	int i = 1, j = n - 1;
+	return matrixChainMemoised(p, i, j);
 }
 
 // Driver Code
 int main()
 {
-	int arr[] = { 1, 2, 3, 4, 3 };
+	int arr[] = { 1, 2, 3, 4 };
 	int n = sizeof(arr) / sizeof(arr[0]);
+	memset(dp, -1, sizeof dp);
 
 	cout << "Minimum number of multiplications is "
-		<< MatrixChainOrder(arr, 1, n - 1);
+		<< MatrixChainOrder(arr, n);
 }
 
-// This code is contributed by Shivi_Aggarwal
+// This code is contributed by Sumit_Yadav
